@@ -19,7 +19,7 @@ public class CarValidator {
 
     public static int productionYearValidation(int productionYear) {
         if(productionYear < 1900 || productionYear > 2026) {
-            throw new IllegalArgumentException("Car productionYear must be between 1900 and 2026 hp. Invalid value: " + productionYear);
+            throw new IllegalArgumentException("Car productionYear must be between 1900 and 2026. Invalid value: " + productionYear);
         }
         return productionYear;
     }
