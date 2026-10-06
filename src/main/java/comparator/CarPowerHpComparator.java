@@ -1,4 +1,4 @@
-package main.comparator;
+package comparator;
 
 import main.model.Car;
 
