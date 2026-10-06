@@ -1,5 +1,7 @@
 package main.model;
 
+import main.validation.CarValidator;
+
 import java.util.Objects;
 
 public final class Car {
@@ -22,19 +24,16 @@ public final class Car {
             if(Objects.isNull(model)) {
                 throw new NullPointerException("Car model must not be null");
             }
-            if(model.isBlank()) {
-                throw new IllegalArgumentException("Car model must not be blank");
-            }
-            this.model = model;
+            this.model = CarValidator.modelValidation(model);
         }
 
         public CarBuilder powerHp(int powerHp) {
-            this.powerHp = powerHp;
+            this.powerHp = CarValidator.powerHpValidation(powerHp);
             return this;
         }
 
         public CarBuilder productionYear(int productionYear) {
-            this.productionYear = productionYear;
+            this.productionYear = CarValidator.productionYearValidation(productionYear);
             return this;
         }
 
