@@ -1,4 +1,4 @@
-package main.validation;
+package validation;
 
 public class CarValidator {
     private CarValidator(){}

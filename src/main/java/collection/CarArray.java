@@ -1,6 +1,6 @@
-package main.collection;
+package collection;
 
-import main.model.Car;
+import model.Car;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
