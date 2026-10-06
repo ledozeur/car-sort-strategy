@@ -1,6 +1,6 @@
-package main.model;
+package model;
 
-import main.validation.CarValidator;
+import validation.CarValidator;
 
 import java.util.Objects;
 
