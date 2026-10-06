@@ -1,6 +1,6 @@
 package comparator;
 
-import main.model.Car;
+import model.Car;
 
 public class CarModelComparator implements CarComparator {
     @Override
