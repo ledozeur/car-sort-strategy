@@ -7,6 +7,9 @@ public class CarValidator {
         if(model.isBlank()) {
             throw new IllegalArgumentException("Car model must not be blank");
         }
+        if(model.length() > 60) {
+            throw new IllegalArgumentException("Car model lenght must be in 1-60. model: " + model + ", length: "+ model.length());
+        }
         return model;
     }
 
@@ -19,7 +22,7 @@ public class CarValidator {
 
     public static int productionYearValidation(int productionYear) {
         if(productionYear < 1900 || productionYear > 2026) {
-            throw new IllegalArgumentException("Car productionYear must be between 1900 and 2026 hp. Invalid value: " + productionYear);
+            throw new IllegalArgumentException("Car productionYear must be between 1900 and 2026. Invalid value: " + productionYear);
         }
         return productionYear;
     }

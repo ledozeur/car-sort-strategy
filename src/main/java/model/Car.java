@@ -15,6 +15,27 @@ public final class Car {
         this.productionYear = cb.productionYear;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Car car = (Car) o;
+        return powerHp == car.powerHp && productionYear == car.productionYear && Objects.equals(model, car.model);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(model, powerHp, productionYear);
+    }
+
+    @Override
+    public String toString() {
+        return "Car{" +
+                "model='" + model + '\'' +
+                ", powerHp=" + powerHp +
+                ", productionYear=" + productionYear +
+                '}';
+    }
+
     public static class CarBuilder {
         private String model;
         private int powerHp = 100;
