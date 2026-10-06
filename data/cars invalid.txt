@@ -1,0 +1,15 @@
+Camry;249;2021
+Corolla;29;2019
+Civic;1201;2018
+Accord;192;1899
+Mustang;450;2027
+;150;2017
+   ;150;2017
+Passat;abc;2016
+Octavia;110;two thousand
+Rapid;90
+Logan;82;2013;extra
+Solaris;;2018
+Creta;149;
+ThisModelNameIsDefinitelyTooLongBecauseItExceedsSixtyCharactersInTotal;100;2000
+Rio;100;2012
