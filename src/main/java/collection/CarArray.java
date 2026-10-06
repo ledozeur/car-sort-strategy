@@ -44,6 +44,17 @@ public class CarArray implements Iterable<Car> {
         return this;
     }
 
+    public void clear() {
+        data = new Car[DEFAULT_CAPACITY];
+        size = 0;
+    }
+
+    public Car[] toArray() {
+        Car[] newData = new Car[size];
+        System.arraycopy(data, 0, newData, 0, size);
+        return newData;
+    }
+
     @Override
     public Iterator<Car> iterator() {
         return new CarArrayIterator();
