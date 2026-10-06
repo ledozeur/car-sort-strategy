@@ -1,6 +1,6 @@
 package comparator;
 
-import main.model.Car;
+import model.Car;
 
 public interface CarComparator {
     int compare(Car a, Car b);
