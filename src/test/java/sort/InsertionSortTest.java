@@ -11,8 +11,8 @@ import strategy.InsertionSortStrategy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InsertionSortTest {
-    RandomCarFillService fillService = new RandomCarFillService();
-    InsertionSortStrategy sortStrategy = new InsertionSortStrategy();
+    private final RandomCarFillService fillService = new RandomCarFillService();
+    private final InsertionSortStrategy sortStrategy = new InsertionSortStrategy();
 
     @Test
     public void hpSortTest() {

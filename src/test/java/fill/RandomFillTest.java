@@ -8,7 +8,7 @@ import validation.CarValidator;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RandomFillTest {
-    RandomCarFillService fillService = new RandomCarFillService();
+    private final RandomCarFillService fillService = new RandomCarFillService();
 
     @Test
     public void generationTest() {

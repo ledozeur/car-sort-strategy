@@ -11,8 +11,8 @@ import strategy.BubbleSortStrategy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BubbleSortTest {
-    RandomCarFillService fillService = new RandomCarFillService();
-    BubbleSortStrategy sortStrategy = new BubbleSortStrategy();
+    private final RandomCarFillService fillService = new RandomCarFillService();
+    private final BubbleSortStrategy sortStrategy = new BubbleSortStrategy();
 
     @Test
     public void hpSortTest() {
