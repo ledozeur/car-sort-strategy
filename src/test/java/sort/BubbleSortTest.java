@@ -15,7 +15,7 @@ public class BubbleSortTest {
     private final BubbleSortStrategy sortStrategy = new BubbleSortStrategy();
 
     @Test
-    public void hpSortTest() {
+    void hpSortTest() {
         boolean isSorted = true;
         CarArray array = fillService.create(10);
         sortStrategy.sort(array, new CarPowerHpComparator());
@@ -28,7 +28,7 @@ public class BubbleSortTest {
     }
 
     @Test
-    public void yearSortTest() {
+    void yearSortTest() {
         boolean isSorted = true;
         CarArray array = fillService.create(10);
         sortStrategy.sort(array, new CarProductionYearComparator());
@@ -41,7 +41,7 @@ public class BubbleSortTest {
     }
 
     @Test
-    public void modelSortTest() {
+    void modelSortTest() {
         boolean isSorted = true;
         CarArray array = fillService.create(10);
         sortStrategy.sort(array, new CarModelComparator());

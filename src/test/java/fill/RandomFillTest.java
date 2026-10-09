@@ -11,27 +11,27 @@ public class RandomFillTest {
     private final RandomCarFillService fillService = new RandomCarFillService();
 
     @Test
-    public void generationTest() {
+    void generationTest() {
         CarArray array = fillService.create(10);
         assertTrue(array.size() != 0, "Array is empty");
     }
 
     @Test
-    public void arrayUniqueTest(){
+    void arrayUniqueTest() {
         CarArray array = fillService.create(10);
         CarArray array2 = fillService.create(10);
         assertNotEquals(array, array2, "Arrays not unique");
     }
 
     @Test
-    public void limitTest(){
+    void limitTest() {
         Integer limit = 10;
         CarArray array = fillService.create(limit);
         assertEquals(limit, array.size());
     }
 
     @Test
-    public void objectValidationTest(){
+    void objectValidationTest() {
         CarArray array = fillService.create(10);
         for (Car car : array) {
             assertDoesNotThrow(() -> CarValidator.modelValidation(car.getModel()));
