@@ -25,6 +25,7 @@ public class ManualCarFillService implements CarFillService {
             if (array.size() > 0) {
                 printArray(array);
                 System.out.println("Для сохранения данных и выхода введите \"-1\"");
+                System.out.println("Для сброса списка введите \"-2\"");
             }
             if (array.size() >= limit && limit != -1) {
                 return array;
@@ -34,7 +35,13 @@ public class ManualCarFillService implements CarFillService {
 
             if (text.trim().equals("-1")) {
                 scan = false;
+                continue;
             }
+            if (text.trim().equals("-2")){
+                array.clear();
+                continue;
+            }
+
             try {
                 array.add(getCarFromText(text));
             } catch (RuntimeException e) {
