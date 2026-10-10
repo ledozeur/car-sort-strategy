@@ -1,4 +1,3 @@
-Camry;249;2021
 Corolla;29;2019
 Civic;1201;2018
 Accord;192;1899
