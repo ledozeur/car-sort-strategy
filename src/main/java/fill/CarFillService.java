@@ -3,5 +3,5 @@ package fill;
 import collection.CarArray;
 
 public interface CarFillService {
-    CarArray create();
+    CarArray create(Integer limit);
 }
