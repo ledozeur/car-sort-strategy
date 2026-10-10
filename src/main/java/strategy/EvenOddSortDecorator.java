@@ -31,7 +31,7 @@ public class EvenOddSortDecorator implements SortStrategy {
                 sortableElements.add(car);
             }
         }
-        sortStrategy.sort(sortableElements, comparator);
+        sortableElements = sortStrategy.sort(sortableElements, comparator);
 
         for (int i = 0; i < indexes.size(); i++) {
             array.set(indexes.get(i), sortableElements.get(i));
