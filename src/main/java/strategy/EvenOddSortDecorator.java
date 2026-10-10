@@ -7,6 +7,7 @@ import model.Car;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 public class EvenOddSortDecorator implements SortStrategy {
     private final SortStrategy sortStrategy;
@@ -18,8 +19,8 @@ public class EvenOddSortDecorator implements SortStrategy {
     }
 
     @Override
-    public CarArray sort(CarArray array, CarComparator comparator) {
-
+    public CarArray sort(CarArray old, CarComparator comparator) {
+        CarArray array = createCopy(old);
         List<Integer> indexes = new ArrayList<>();
         CarArray sortableElements = new CarArray();
         for (int i = 0; i < array.size(); i++) {
@@ -36,5 +37,13 @@ public class EvenOddSortDecorator implements SortStrategy {
             array.set(indexes.get(i), sortableElements.get(i));
         }
         return array;
+    }
+
+    private CarArray createCopy(CarArray old) {
+        CarArray copy = new CarArray();
+        IntStream.range(0, old.size())
+                .mapToObj(old::get)
+                .forEach(copy::add);
+        return copy;
     }
 }
