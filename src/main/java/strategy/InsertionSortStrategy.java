@@ -4,9 +4,12 @@ import collection.CarArray;
 import comparator.CarComparator;
 import model.Car;
 
+import java.util.stream.IntStream;
+
 public class InsertionSortStrategy implements SortStrategy {
     @Override
-    public CarArray sort(CarArray array, CarComparator comparator) {
+    public CarArray sort(CarArray old, CarComparator comparator) {
+        CarArray array = createCopy(old);
         for (int i = 1; i < array.size(); i++) {
             Car current = array.get(i);
             int j = i - 1;
@@ -18,5 +21,13 @@ public class InsertionSortStrategy implements SortStrategy {
             array.set(j + 1, current);
         }
         return array;
+    }
+
+    private CarArray createCopy(CarArray old) {
+        CarArray copy = new CarArray();
+        IntStream.range(0, old.size())
+                .mapToObj(old::get)
+                .forEach(copy::add);
+        return copy;
     }
 }
