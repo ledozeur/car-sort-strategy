@@ -7,7 +7,8 @@ import model.Car;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.IntStream;
+
+import static utility.CopyCarArray.createCopy;
 
 public class EvenOddSortDecorator implements SortStrategy {
     private final SortStrategy sortStrategy;
@@ -31,19 +32,11 @@ public class EvenOddSortDecorator implements SortStrategy {
                 sortableElements.add(car);
             }
         }
-        sortStrategy.sort(sortableElements, comparator);
+        sortableElements = sortStrategy.sort(sortableElements, comparator);
 
         for (int i = 0; i < indexes.size(); i++) {
             array.set(indexes.get(i), sortableElements.get(i));
         }
         return array;
-    }
-
-    private CarArray createCopy(CarArray old) {
-        CarArray copy = new CarArray();
-        IntStream.range(0, old.size())
-                .mapToObj(old::get)
-                .forEach(copy::add);
-        return copy;
     }
 }
