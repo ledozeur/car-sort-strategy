@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static utility.CarParserText.getCarFromText;
+import static utility.CarParserText.printArray;
 
 public class ManualCarFillService implements CarFillService {
     private final Scanner scanner;
@@ -51,12 +52,5 @@ public class ManualCarFillService implements CarFillService {
         return array;
     }
 
-    private void printArray(CarArray array) {
-        String text = IntStream.range(0, array.size())
-                .mapToObj(array::get)
-                .map(CarParserText::carToText)
-                .collect(Collectors.joining())
-                .trim();
-        System.out.println(text);
-    }
+
 }
