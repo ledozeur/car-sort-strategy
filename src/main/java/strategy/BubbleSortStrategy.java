@@ -4,7 +4,7 @@ import collection.CarArray;
 import comparator.CarComparator;
 import model.Car;
 
-import java.util.stream.IntStream;
+import static utility.CopyCarArray.createCopy;
 
 public class BubbleSortStrategy implements SortStrategy {
 
@@ -21,13 +21,5 @@ public class BubbleSortStrategy implements SortStrategy {
             }
         }
         return array;
-    }
-
-    private CarArray createCopy(CarArray old) {
-        CarArray copy = new CarArray();
-        IntStream.range(0, old.size())
-                .mapToObj(old::get)
-                .forEach(copy::add);
-        return copy;
     }
 }

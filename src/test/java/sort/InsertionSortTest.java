@@ -18,7 +18,7 @@ public class InsertionSortTest {
     void hpSortTest() {
         boolean isSorted = true;
         CarArray array = fillService.create(10);
-        sortStrategy.sort(array, new CarPowerHpComparator());
+        array = sortStrategy.sort(array, new CarPowerHpComparator());
         for (int i = 1; i < array.size(); i++) {
             if (array.get(i).getPowerHp() < array.get(i - 1).getPowerHp()) {
                 isSorted = false;
@@ -31,7 +31,7 @@ public class InsertionSortTest {
     void yearSortTest() {
         boolean isSorted = true;
         CarArray array = fillService.create(10);
-        sortStrategy.sort(array, new CarProductionYearComparator());
+        array = sortStrategy.sort(array, new CarProductionYearComparator());
         for (int i = 1; i < array.size(); i++) {
             if (array.get(i).getProductionYear() < array.get(i - 1).getProductionYear()) {
                 isSorted = false;
@@ -44,7 +44,7 @@ public class InsertionSortTest {
     void modelSortTest() {
         boolean isSorted = true;
         CarArray array = fillService.create(10);
-        sortStrategy.sort(array, new CarModelComparator());
+        array = sortStrategy.sort(array, new CarModelComparator());
         for (int i = 1; i < array.size(); i++) {
             if (new CarModelComparator().compare(array.get(i), array.get(i - 1)) < 0) {
                 isSorted = false;

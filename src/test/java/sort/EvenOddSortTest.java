@@ -28,7 +28,7 @@ public class EvenOddSortTest {
         cars.add(car("Odd-201", 201));
         cars.add(car("Even-200", 200));
 
-        decorator.sort(cars, new CarPowerHpComparator());
+        cars = decorator.sort(cars, new CarPowerHpComparator());
 
         assertEquals(
                 List.of(101, 100, 200, 201, 300),
@@ -46,7 +46,7 @@ public class EvenOddSortTest {
         cars.add(car("Odd-301", 301));
         cars.add(car("Even-200", 200));
 
-        decorator.sort(cars, new CarPowerHpComparator());
+        cars = decorator.sort(cars, new CarPowerHpComparator());
 
         assertEquals(101, cars.get(0).getPowerHp());
         assertEquals(201, cars.get(2).getPowerHp());
