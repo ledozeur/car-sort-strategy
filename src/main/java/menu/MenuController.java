@@ -40,15 +40,58 @@ public class MenuController {
 
     private static final int COUNT_THREAD_COUNT = 4;
 
+    private void setCarsFromFill(Scanner sc, CarArray newCars) {
+        if (cars.size() == 0) {
+            cars = newCars;
+            lastSorted = null;
+            System.out.println("Список создан. Сейчас в нём " + cars.size() + " автомобилей.");
+            return;
+        }
+        System.out.println(
+                "В списке уже " + cars.size() + " авто.\n" +
+                        "1 — заменить список новыми данными\n" +
+                        "2 — добавить новые данные к текущему списку");
+        while (true) {
+            if (!sc.hasNextInt()) {
+                sc.nextLine();
+                System.out.println("Введите 1 или 2.");
+                continue;
+            }
+            int mode = sc.nextInt();
+            sc.nextLine();
+            if (mode == 1) {
+                cars = newCars;
+                lastSorted = null;
+                System.out.println(
+                        "Список заменён. Сейчас " + cars.size() + " автомобилей. " +
+                                "Повторите сортировку (п. 3), если нужен новый результат для п. 4.");
+                return;
+            }
+            if (mode == 2) {
+                CarArray merged = cars.createCopy();
+                for (Car car : newCars) {
+                    merged.add(car);
+                }
+                cars = merged;
+                lastSorted = null;
+                System.out.println(
+                        "Данные добавлены. Сейчас в списке " + cars.size() + " автомобилей. " +
+                                "Повторите сортировку (п. 3), если нужен новый результат для п. 4.");
+                return;
+            }
+            System.out.println("Введите 1 или 2.");
+        }
+    }
+
     public void run() {
         Scanner sc = new Scanner(System.in);
         while (true) {
             System.out.println(
                     "1 — заполнить массив\n" +
-                            "2 — показать\n" +
-                            "3 — сортировать\n" +
-                            "4 — записать в файл\n" +
-                            "5 — подсчитать N\n" +
+                            "2 — показать текущий список (исходный, как после п. 1)\n" +
+                            "3 — сортировать (исходный список не меняется; результат — для п. 4)\n" +
+                            "4 — записать в файл последний результат сортировки (п. 3)\n" +
+                            "5 — подсчитать вхождения в текущем списке (п. 2), не в отсортированном\n" +
                             "0 — выход");
 
             if (!sc.hasNextInt()) {
@@ -69,6 +112,10 @@ public class MenuController {
                                         "2 — случайно\n" +
                                         "3 — вручную\n" +
                                         "0 — назад");
+                        if (cars.size() > 0) {
+                            System.out.println(
+                                    "(сейчас в списке " + cars.size() + " авто — при загрузке можно заменить или добавить)");
+                        }
 
                         if (!sc.hasNextInt()) {
                             sc.nextLine();
@@ -109,8 +156,8 @@ public class MenuController {
                                 try {
                                     FileCarFillService fileFill =
                                             new FileCarFillService(Path.of(filePath), carParser);
-                                    cars = fileFill.create(fileLimit);
-                                    System.out.println("Загружено автомобилей: " + cars.size());
+                                    CarArray loaded = fileFill.create(fileLimit);
+                                    setCarsFromFill(sc, loaded);
                                 } catch (UncheckedIOException e) {
                                     System.out.println("Не удалось прочитать файл: " + filePath);
                                 }
@@ -131,8 +178,8 @@ public class MenuController {
                                     continue;
                                 }
                                 RandomCarFillService r = new RandomCarFillService();
-                                cars = r.create(n);
-                                System.out.println("Загружено автомобилей: " + cars.size());
+                                CarArray generated = r.create(n);
+                                setCarsFromFill(sc, generated);
                                 break;
                             case 3: {
                                 System.out.println(
@@ -152,7 +199,8 @@ public class MenuController {
                                         "Ввод в формате: модель;мощность;год\n" +
                                                 "Для выхода с сохранением: -1, сброс списка: -2");
                                 ManualCarFillService manual = new ManualCarFillService(sc);
-                                cars = manual.create(limit);
+                                CarArray entered = manual.create(limit);
+                                setCarsFromFill(sc, entered);
                                 break;
                             }
                             default:
@@ -165,9 +213,10 @@ public class MenuController {
                 case 2:
 
                     if (!(cars.size() == 0)) {
+                        System.out.println("Текущий список (" + cars.size() + " авто):");
                         System.out.println(cars);
                     } else {
-                        System.out.println("Массив пуст.");
+                        System.out.println("Массив пуст. Заполните данные (пункт 1).");
                     }
 
                     break;
@@ -264,13 +313,16 @@ public class MenuController {
 
                     lastSorted = strategy.sort(cars, comparator);
 
-                    System.out.println("Отсортированный массив:");
+                    System.out.println("Отсортированный массив (для записи в файл — пункт 4):");
                     System.out.println(lastSorted);
+                    System.out.println("Исходный список (пункт 2) не изменён.");
                     break;
                 }
                 case 4: {
                     if (lastSorted == null || lastSorted.size() == 0) {
-                        System.out.println("Нет результата сортировки. Сначала выполните пункт 3.");
+                        System.out.println(
+                                "Нет результата сортировки. Сначала выполните пункт 3. " +
+                                        "Записывается не текущий список из п. 2, а последняя сортировка.");
                         break;
                     }
                     if (resultFileWriter.save(lastSorted)) {
@@ -285,11 +337,17 @@ public class MenuController {
                         System.out.println("Массив пуст. Сначала заполните данные (пункт 1).");
                         break;
                     }
-                    System.out.println("Введите автомобиль N (модель;мощность;год): ");
+                    System.out.println(
+                            "Подсчёт по текущему списку (" + cars.size() + " авто), как в пункте 2.\n" +
+                                    "Введите автомобиль N в формате: модель;мощность;год\n" +
+                                    "Пример: Toyota Camry;181;2020\n" +
+                                    "Совпадение по всем трём полям (модель, мощность 30–1200, год 1900–2026).");
                     String carLine = sc.nextLine().trim();
                     Optional<Car> targetCar = carParser.parse(carLine);
                     if (targetCar.isEmpty()) {
-                        System.out.println("Некорректные данные. Формат: модель;мощность;год");
+                        System.out.println(
+                                "Некорректные данные. Формат: модель;мощность;год. " +
+                                        "Скопируйте строку из вывода п. 2, не из Car{...}.");
                         break;
                     }
                     parallelCountService.countAndPrint(cars, targetCar.get(), COUNT_THREAD_COUNT);
