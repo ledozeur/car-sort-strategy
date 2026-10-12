@@ -9,6 +9,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 public class FileCarFillService implements CarFillService{
@@ -23,9 +24,10 @@ public class FileCarFillService implements CarFillService{
     @Override
     public CarArray create(Integer limit) {
         CarArray cars = new CarArray();
+        AtomicInteger lineNumber = new AtomicInteger();
         try (Stream<String> lines = Files.lines(path)) {
             Stream<Car> carStream = lines
-                    .map(parser::parse)
+                    .map(line -> parseOrReport(lineNumber.incrementAndGet(), line))
                     .flatMap(Optional::stream);
             if (limit != -1) {
                 carStream = carStream.limit(limit);
@@ -35,5 +37,13 @@ public class FileCarFillService implements CarFillService{
             throw new UncheckedIOException(e);
         }
         return cars;
+    }
+
+    private Optional<Car> parseOrReport(int lineNumber, String line) {
+        Optional<Car> car = parser.parse(line);
+        if (car.isEmpty()) {
+            System.out.println(lineNumber + ": " + line + " (invalid)");
+        }
+        return car;
     }
 }
