@@ -1,20 +1,44 @@
 package menu;
 
 import collection.CarArray;
+import comparator.CarComparator;
+import comparator.CarModelComparator;
+import comparator.CarPowerHpComparator;
+import comparator.CarProductionYearComparator;
 import fill.FileCarFillService;
 import fill.ManualCarFillService;
 import fill.RandomCarFillService;
+import concurrency.ParallelCountService;
+import io.ResultFileWriter;
+import model.Car;
 import parser.CarParser;
-import utility.CarParserText;
+import strategy.BubbleSortStrategy;
+import strategy.EvenOddSortDecorator;
+import strategy.InsertionSortStrategy;
+import strategy.SortStrategy;
 
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.Scanner;
+import java.util.function.Function;
 
 public class MenuController {
 
     private CarArray cars = new CarArray();
     private CarArray lastSorted;
+
+    private final BubbleSortStrategy bubbleSortStrategy = new BubbleSortStrategy();
+    private final InsertionSortStrategy insertionSortStrategy = new InsertionSortStrategy();
+
+    private final CarModelComparator carModelComparator = new CarModelComparator();
+    private final CarPowerHpComparator carPowerHpComparator = new CarPowerHpComparator();
+    private final CarProductionYearComparator carProductionYearComparator = new CarProductionYearComparator();
+    private final ResultFileWriter resultFileWriter = new ResultFileWriter();
+    private final ParallelCountService parallelCountService = new ParallelCountService();
+    private final CarParser carParser = new CarParser();
+
+    private static final int COUNT_THREAD_COUNT = 4;
 
     public void run() {
         Scanner sc = new Scanner(System.in);
@@ -108,8 +132,7 @@ public class MenuController {
                                 }
                                 RandomCarFillService r = new RandomCarFillService();
                                 cars = r.create(n);
-
-
+                                System.out.println("Загружено автомобилей: " + cars.size());
                                 break;
                             case 3: {
                                 System.out.println(
@@ -149,11 +172,16 @@ public class MenuController {
 
                     break;
                 case 3: {
+                    if (cars.size() == 0) {
+                        System.out.println("Массив пуст. Сначала заполните данные (пункт 1).");
+                        break;
+                    }
+
                     System.out.println(
                             "\nАлгоритм:\n" +
                                     "1 — Bubble Sort\n" +
                                     "2 — Insertion Sort\n" +
-                                    "3 — Even/Odd\n" +
+                                    "3 — Even/Odd (чётные по полю сортируются, нечётные на местах)\n" +
                                     "0 — назад");
 
                     if (!sc.hasNextInt()) {
@@ -164,23 +192,11 @@ public class MenuController {
                     int alg = sc.nextInt();
                     sc.nextLine();
 
-                    switch (alg) {
-                        case 0:
-                            break;
-                        case 1:
-                            // TODO: BubbleSortStrategy
-                            break;
-                        case 2:
-                            // TODO: InsertionSortStrategy
-                            break;
-                        case 3:
-                            // TODO: EvenOddSortDecorator
-                            break;
-                        default:
-                            System.out.println("Неверный алгоритм.");
-                            break;
-                    }
                     if (alg == 0) {
+                        break;
+                    }
+                    if (alg < 1 || alg > 3) {
+                        System.out.println("Неверный алгоритм.");
                         break;
                     }
 
@@ -199,32 +215,78 @@ public class MenuController {
                     int field = sc.nextInt();
                     sc.nextLine();
 
-                    switch (field) {
-                        case 0:
-                            break;
-                        case 1:
-                            // TODO: CarModelComparator
-                            break;
-                        case 2:
-                            // TODO: CarPowerHpComparator
-                            break;
-                        case 3:
-                            // TODO: CarProductionYearComparator
-                            break;
-                        default:
-                            System.out.println("Неверное поле.");
-                            break;
+                    if (field == 0) {
+                        break;
                     }
 
-                    // TODO: CopyCarArray + strategy.sort + lastSorted + вывод
+                    CarComparator comparator;
+                    if (field == 1) {
+                        comparator = carModelComparator;
+                    } else if (field == 2) {
+                        comparator = carPowerHpComparator;
+                    } else if (field == 3) {
+                        comparator = carProductionYearComparator;
+                    } else {
+                        System.out.println("Неверное поле.");
+                        break;
+                    }
+
+                    if (alg == 3 && field == 1) {
+                        System.out.println(
+                                "Even/Odd для модели не поддерживается. Выберите мощность (2) или год (3).");
+                        break;
+                    }
+
+                    SortStrategy strategy;
+                    if (alg == 1) {
+                        strategy = bubbleSortStrategy;
+                    } else if (alg == 2) {
+                        strategy = insertionSortStrategy;
+                    } else if (alg == 3) {
+                        Function<Car, Integer> evenOddKey;
+                        if (field == 3) {
+                            evenOddKey = Car::getProductionYear;
+                        } else {
+                            evenOddKey = Car::getPowerHp;
+                        }
+                        strategy = new EvenOddSortDecorator(insertionSortStrategy, evenOddKey);
+                    } else {
+                        break;
+                    }
+
+                    lastSorted = strategy.sort(cars, comparator);
+
+                    System.out.println("Отсортированный массив:");
+                    System.out.println(lastSorted);
                     break;
                 }
-                case 4:
-                    // TODO: ResultFileWriter.save(lastSorted)
+                case 4: {
+                    if (lastSorted == null || lastSorted.size() == 0) {
+                        System.out.println("Нет результата сортировки. Сначала выполните пункт 3.");
+                        break;
+                    }
+                    if (resultFileWriter.save(lastSorted)) {
+                        System.out.println("Данные добавлены в файл output/sorted_cars.txt");
+                    } else {
+                        System.out.println("Не удалось записать файл.");
+                    }
                     break;
-                case 5:
-                    // TODO: ParallelCountService
+                }
+                case 5: {
+                    if (cars.size() == 0) {
+                        System.out.println("Массив пуст. Сначала заполните данные (пункт 1).");
+                        break;
+                    }
+                    System.out.println("Введите автомобиль N (модель;мощность;год): ");
+                    String carLine = sc.nextLine().trim();
+                    Optional<Car> targetCar = carParser.parse(carLine);
+                    if (targetCar.isEmpty()) {
+                        System.out.println("Некорректные данные. Формат: модель;мощность;год");
+                        break;
+                    }
+                    parallelCountService.countAndPrint(cars, targetCar.get(), COUNT_THREAD_COUNT);
                     break;
+                }
                 case 0:
                     return;
                 default:
