@@ -4,13 +4,11 @@ import collection.CarArray;
 import comparator.CarComparator;
 import model.Car;
 
-import static utility.CopyCarArray.createCopy;
-
 public class BubbleSortStrategy implements SortStrategy {
 
     @Override
     public CarArray sort(CarArray old, CarComparator comparator) {
-        CarArray array = createCopy(old);
+        CarArray array = old.createCopy();
         for (int i = 0; i < array.size(); i++) {
             for (int j = 0; j < array.size() - i - 1; j++) {
                 if (comparator.compare(array.get(j), array.get(j + 1)) > 0) {

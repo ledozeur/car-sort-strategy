@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import static utility.CopyCarArray.createCopy;
-
 public class EvenOddSortDecorator implements SortStrategy {
     private final SortStrategy sortStrategy;
     private final Function<Car, Integer> valueExtractor;
@@ -21,7 +19,7 @@ public class EvenOddSortDecorator implements SortStrategy {
 
     @Override
     public CarArray sort(CarArray old, CarComparator comparator) {
-        CarArray array = createCopy(old);
+        CarArray array = old.createCopy();
         List<Integer> indexes = new ArrayList<>();
         CarArray sortableElements = new CarArray();
         for (int i = 0; i < array.size(); i++) {

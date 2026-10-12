@@ -3,7 +3,6 @@ package menu;
 import collection.CarArray;
 import fill.ManualCarFillService;
 import fill.RandomCarFillService;
-import utility.CarParserText;
 
 import java.util.Scanner;
 
@@ -107,7 +106,7 @@ public class MenuController {
                 case 2:
 
                     if (!(cars.size() == 0)) {
-                        CarParserText.printArray(cars);
+                        System.out.println(cars);
                     } else {
                         System.out.println("Массив пуст.");
                     }
