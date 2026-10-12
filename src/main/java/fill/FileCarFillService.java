@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-public class FileCarFillService implements CarFillService{
+public class FileCarFillService implements CarFillService {
     private final Path path;
     private final CarParser parser;
 
@@ -40,10 +40,11 @@ public class FileCarFillService implements CarFillService{
     }
 
     private Optional<Car> parseOrReport(int lineNumber, String line) {
-        Optional<Car> car = parser.parse(line);
-        if (car.isEmpty()) {
-            System.out.println(lineNumber + ": " + line + " (invalid)");
+        CarParser.LineParseResult result = parser.parseLine(line);
+        if (result.car().isEmpty()) {
+            String reason = result.errorMessage().orElse("неверные данные");
+            System.out.printf("Строка %d: \"%s\" — %s%n", lineNumber, line, reason);
         }
-        return car;
+        return result.car();
     }
 }
