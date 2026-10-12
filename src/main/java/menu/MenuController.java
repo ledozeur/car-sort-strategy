@@ -245,10 +245,18 @@ public class MenuController {
                     } else if (alg == 2) {
                         strategy = insertionSortStrategy;
                     } else if (evenOddMode) {
-                        Function<Car, Integer> evenOddKey = field == 3
-                                ? Car::getProductionYear
-                                : Car::getPowerHp;
-                        SortStrategy baseSort = alg == 3 ? bubbleSortStrategy : insertionSortStrategy;
+                        Function<Car, Integer> evenOddKey;
+                        if (field == 3) {
+                            evenOddKey = car -> car.getProductionYear();
+                        } else {
+                            evenOddKey = car -> car.getPowerHp();
+                        }
+                        SortStrategy baseSort;
+                        if (alg == 3) {
+                            baseSort = bubbleSortStrategy;
+                        } else {
+                            baseSort = insertionSortStrategy;
+                        }
                         strategy = new EvenOddSortDecorator(baseSort, evenOddKey);
                     } else {
                         break;
