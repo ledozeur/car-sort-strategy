@@ -108,7 +108,7 @@ public class MenuController {
 
                                 try {
                                     FileCarFillService fileFill =
-                                            new FileCarFillService(Path.of(filePath), new CarParser());
+                                            new FileCarFillService(Path.of(filePath), carParser);
                                     cars = fileFill.create(fileLimit);
                                     System.out.println("Загружено автомобилей: " + cars.size());
                                 } catch (UncheckedIOException e) {
