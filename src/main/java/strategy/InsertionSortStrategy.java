@@ -4,12 +4,10 @@ import collection.CarArray;
 import comparator.CarComparator;
 import model.Car;
 
-import static utility.CopyCarArray.createCopy;
-
 public class InsertionSortStrategy implements SortStrategy {
     @Override
     public CarArray sort(CarArray old, CarComparator comparator) {
-        CarArray array = createCopy(old);
+        CarArray array = old.createCopy();
         for (int i = 1; i < array.size(); i++) {
             Car current = array.get(i);
             int j = i - 1;

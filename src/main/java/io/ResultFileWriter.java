@@ -5,21 +5,27 @@ import collection.CarArray;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ResultFileWriter implements ResultWriter {
-    private final String defaultPath = "data/output/";
+    private final String defaultPath;
+
+    public ResultFileWriter() {
+        defaultPath = "data/output/";
+    }
+
+    public ResultFileWriter(String path) {
+        defaultPath = path;
+    }
 
     @Override
-    public boolean save(CarArray data, String path) {
+    public boolean save(CarArray data) {
         String txt = carArrayToTxt(data);
 
         try (BufferedWriter bf = new BufferedWriter(new FileWriter(
-                path + Instant.now().toEpochMilli()
+                defaultPath + Instant.now().toEpochMilli()
                         + ".txt"))) {
 
             bf.write(txt);
@@ -28,11 +34,6 @@ public class ResultFileWriter implements ResultWriter {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public boolean save(CarArray data) {
-        return save(data, defaultPath);
     }
 
     private String carArrayToTxt(CarArray array) {
