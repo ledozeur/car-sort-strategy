@@ -1,10 +1,14 @@
 package menu;
 
 import collection.CarArray;
+import fill.FileCarFillService;
 import fill.ManualCarFillService;
 import fill.RandomCarFillService;
+import parser.CarParser;
 import utility.CarParserText;
 
+import java.io.UncheckedIOException;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 public class MenuController {
@@ -54,9 +58,40 @@ public class MenuController {
                             case 0:
                                 exitFill = true;
                                 break;
-                            case 1:
+                            case 1: {
+                                System.out.println("Путь к файлу (Enter — data/cars.txt): ");
+                                String pathInput = sc.nextLine().trim();
+                                String filePath;
+                                if (pathInput.isEmpty()) {
+                                    filePath = "data/cars.txt";
+                                } else {
+                                    filePath = pathInput;
+                                }
 
+                                System.out.println(
+                                        "Лимит автомобилей (-1 — все из файла, иначе целое число > 0): ");
+                                if (!sc.hasNextInt()) {
+                                    sc.nextLine();
+                                    System.out.println("Введите -1 или целое число > 0");
+                                    continue;
+                                }
+                                int fileLimit = sc.nextInt();
+                                sc.nextLine();
+                                if (fileLimit != -1 && fileLimit <= 0) {
+                                    System.out.println("Нужно -1 или число > 0. Попробуйте снова.");
+                                    continue;
+                                }
+
+                                try {
+                                    FileCarFillService fileFill =
+                                            new FileCarFillService(Path.of(filePath), new CarParser());
+                                    cars = fileFill.create(fileLimit);
+                                    System.out.println("Загружено автомобилей: " + cars.size());
+                                } catch (UncheckedIOException e) {
+                                    System.out.println("Не удалось прочитать файл: " + filePath);
+                                }
                                 break;
+                            }
                             case 2:
 
                                 System.out.println("Введите количество автомобилей: ");
@@ -133,13 +168,13 @@ public class MenuController {
                         case 0:
                             break;
                         case 1:
-
+                            // TODO: BubbleSortStrategy
                             break;
                         case 2:
-
+                            // TODO: InsertionSortStrategy
                             break;
                         case 3:
-
+                            // TODO: EvenOddSortDecorator
                             break;
                         default:
                             System.out.println("Неверный алгоритм.");
@@ -168,27 +203,27 @@ public class MenuController {
                         case 0:
                             break;
                         case 1:
-
+                            // TODO: CarModelComparator
                             break;
                         case 2:
-
+                            // TODO: CarPowerHpComparator
                             break;
                         case 3:
-
+                            // TODO: CarProductionYearComparator
                             break;
                         default:
                             System.out.println("Неверное поле.");
                             break;
                     }
 
-
+                    // TODO: CopyCarArray + strategy.sort + lastSorted + вывод
                     break;
                 }
                 case 4:
-
+                    // TODO: ResultFileWriter.save(lastSorted)
                     break;
                 case 5:
-
+                    // TODO: ParallelCountService
                     break;
                 case 0:
                     return;
