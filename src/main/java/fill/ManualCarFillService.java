@@ -1,17 +1,13 @@
 package fill;
 
 import collection.CarArray;
-import utility.CarParserText;
+import parser.CarParser;
 
 import java.util.Scanner;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static utility.CarParserText.getCarFromText;
-import static utility.CarParserText.printArray;
 
 public class ManualCarFillService implements CarFillService {
     private final Scanner scanner;
+    private final CarParser parser = new CarParser();
 
     public ManualCarFillService(Scanner scanner) {
         this.scanner = scanner;
@@ -24,7 +20,7 @@ public class ManualCarFillService implements CarFillService {
         while (scan) {
             System.out.println("\n\n\n");
             if (array.size() > 0) {
-                printArray(array);
+                System.out.println(array);
                 System.out.println("Для сохранения данных и выхода введите \"-1\"");
                 System.out.println("Для сброса списка введите \"-2\"");
             }
@@ -38,16 +34,12 @@ public class ManualCarFillService implements CarFillService {
                 scan = false;
                 continue;
             }
-            if (text.trim().equals("-2")){
+            if (text.trim().equals("-2")) {
                 array.clear();
                 continue;
             }
-
-            try {
-                array.add(getCarFromText(text));
-            } catch (RuntimeException e) {
-                System.out.println(e);
-            }
+            array.add(parser.parse(text).orElseThrow(()
+                    -> new RuntimeException("Введенный текст не может быть конвертирован в car")));
         }
         return array;
     }

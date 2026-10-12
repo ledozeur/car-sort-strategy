@@ -19,4 +19,10 @@ public class CarParser {
             return Optional.empty();
         }
     }
+
+    public StringBuilder ToText(Car car) {
+        return new StringBuilder(car.getModel()).append(";")
+                .append(car.getPowerHp()).append(";")
+                .append(car.getProductionYear()).append("\n");
+    }
 }

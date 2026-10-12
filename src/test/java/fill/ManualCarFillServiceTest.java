@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ManualCarFillServiceTest {
     @Test
-    void create_shouldReturnAllEnteredCars() {
+    void shouldReturnAllEnteredCars() {
         Scanner scanner = new Scanner(
                 "Toyota Camry;200;2022\n" +
                         "BMW M5;625;2024\n" +
@@ -33,7 +33,7 @@ public class ManualCarFillServiceTest {
     }
 
     @Test
-    void create_shouldReturnEmptyArrayWhenImmediatelyStopped() {
+    void shouldReturnEmptyArrayWhenImmediatelyStopped() {
         Scanner scanner = new Scanner("-1\n");
         ManualCarFillService service =
                 new ManualCarFillService(scanner);
@@ -44,24 +44,7 @@ public class ManualCarFillServiceTest {
     }
 
     @Test
-    void create_shouldIgnoreInvalidInput() {
-        Scanner scanner = new Scanner(
-                "invalid input\n" +
-                        "Toyota Camry;200;2022\n" +
-                        "-1\n"
-        );
-
-        ManualCarFillService service =
-                new ManualCarFillService(scanner);
-
-        CarArray result = service.create(10);
-
-        assertEquals(1, result.size());
-        assertEquals("Toyota Camry", result.get(0).getModel());
-    }
-
-    @Test
-    void create_shouldStopAfterLimitCars() {
+    void shouldStopAfterLimitCars() {
         Scanner scanner = new Scanner(
                 "Toyota Camry;200;2022\n" +
                         "BMW M5;625;2024\n" +
@@ -79,7 +62,7 @@ public class ManualCarFillServiceTest {
     }
 
     @Test
-    void create_shouldAllowUnlimitedCarsWhenLimitIsMinusOne() {
+    void shouldAllowUnlimitedCarsWhenLimitIsMinusOne() {
         Scanner scanner = new Scanner(
                 "Toyota Camry;200;2022\n" +
                         "BMW M5;625;2024\n" +

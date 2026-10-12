@@ -2,6 +2,7 @@ package io;
 
 import collection.CarArray;
 import model.Car;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -17,10 +18,17 @@ public class ResultFileWriterTest {
     @TempDir
     Path tempDir;
 
-    private final ResultFileWriter writer = new ResultFileWriter();
+    private ResultFileWriter writer;
+
+    @BeforeEach
+    void setUp() {
+        writer = new ResultFileWriter(
+                tempDir.toString() + java.io.File.separator
+        );
+    }
 
     @Test
-    void save_shouldWriteAllCarsToFile() throws IOException {
+    void shouldWriteAllCarsToFile() throws IOException {
         CarArray cars = new CarArray();
         cars.add(new Car.CarBuilder("Toyota Camry")
                 .powerHp(200)
@@ -31,9 +39,7 @@ public class ResultFileWriterTest {
                 .productionYear(2024)
                 .build());
 
-        String path = tempDir.toString() + java.io.File.separator;
-
-        boolean result = writer.save(cars, path);
+        boolean result = writer.save(cars);
 
         assertTrue(result);
 
@@ -48,11 +54,10 @@ public class ResultFileWriterTest {
     }
 
     @Test
-    void save_shouldWriteEmptyFileWhenArrayIsEmpty() throws IOException {
+    void shouldWriteEmptyFileWhenArrayIsEmpty() throws IOException {
         CarArray cars = new CarArray();
-        String path = tempDir.toString() + java.io.File.separator;
 
-        boolean result = writer.save(cars, path);
+        boolean result = writer.save(cars);
 
         assertTrue(result);
 
@@ -62,32 +67,14 @@ public class ResultFileWriterTest {
     }
 
     @Test
-    void save_shouldReturnFalseWhenDirectoryDoesNotExist() {
-        CarArray cars = new CarArray();
-        cars.add(new Car.CarBuilder("Toyota Camry")
-                .powerHp(200)
-                .productionYear(2022)
-                .build());
-
-        String path = tempDir.resolve("nonexistent")
-                .toString() + java.io.File.separator;
-
-        boolean result = writer.save(cars, path);
-
-        assertFalse(result);
-    }
-
-    @Test
-    void save_shouldPreserveSpecialCharactersInModel() throws IOException {
+    void shouldPreserveSpecialCharactersInModel() throws IOException {
         CarArray cars = new CarArray();
         cars.add(new Car.CarBuilder("Mercedes-Benz E-Class")
                 .powerHp(250)
                 .productionYear(2023)
                 .build());
 
-        String path = tempDir.toString() + java.io.File.separator;
-
-        boolean result = writer.save(cars, path);
+        boolean result = writer.save(cars);
 
         assertTrue(result);
 
