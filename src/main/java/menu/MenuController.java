@@ -181,12 +181,13 @@ public class MenuController {
                             "\nАлгоритм:\n" +
                                     "1 — Bubble Sort\n" +
                                     "2 — Insertion Sort\n" +
-                                    "3 — Even/Odd (чётные по полю сортируются, нечётные на местах)\n" +
+                                    "3 — Bubble Sort + Even/Odd (чётные по полю сортируются, нечётные на местах)\n" +
+                                    "4 — Insertion Sort + Even/Odd (чётные по полю сортируются, нечётные на местах)\n" +
                                     "0 — назад");
 
                     if (!sc.hasNextInt()) {
                         sc.nextLine();
-                        System.out.println("Введите число от 0 до 3.");
+                        System.out.println("Введите число от 0 до 4.");
                         break;
                     }
                     int alg = sc.nextInt();
@@ -195,7 +196,7 @@ public class MenuController {
                     if (alg == 0) {
                         break;
                     }
-                    if (alg < 1 || alg > 3) {
+                    if (alg < 1 || alg > 4) {
                         System.out.println("Неверный алгоритм.");
                         break;
                     }
@@ -231,7 +232,8 @@ public class MenuController {
                         break;
                     }
 
-                    if (alg == 3 && field == 1) {
+                    boolean evenOddMode = alg == 3 || alg == 4;
+                    if (evenOddMode && field == 1) {
                         System.out.println(
                                 "Even/Odd для модели не поддерживается. Выберите мощность (2) или год (3).");
                         break;
@@ -242,14 +244,12 @@ public class MenuController {
                         strategy = bubbleSortStrategy;
                     } else if (alg == 2) {
                         strategy = insertionSortStrategy;
-                    } else if (alg == 3) {
-                        Function<Car, Integer> evenOddKey;
-                        if (field == 3) {
-                            evenOddKey = Car::getProductionYear;
-                        } else {
-                            evenOddKey = Car::getPowerHp;
-                        }
-                        strategy = new EvenOddSortDecorator(insertionSortStrategy, evenOddKey);
+                    } else if (evenOddMode) {
+                        Function<Car, Integer> evenOddKey = field == 3
+                                ? Car::getProductionYear
+                                : Car::getPowerHp;
+                        SortStrategy baseSort = alg == 3 ? bubbleSortStrategy : insertionSortStrategy;
+                        strategy = new EvenOddSortDecorator(baseSort, evenOddKey);
                     } else {
                         break;
                     }
