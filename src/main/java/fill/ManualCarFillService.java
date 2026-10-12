@@ -1,8 +1,10 @@
 package fill;
 
 import collection.CarArray;
+import model.Car;
 import parser.CarParser;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 public class ManualCarFillService implements CarFillService {
@@ -38,8 +40,15 @@ public class ManualCarFillService implements CarFillService {
                 array.clear();
                 continue;
             }
-            array.add(parser.parse(text).orElseThrow(()
-                    -> new RuntimeException("Введенный текст не может быть конвертирован в car")));
+
+            Optional<Car> car = parser.parse(text);
+            if (car.isPresent()) {
+                array.add(car.get());
+            } else {
+                System.out.println("Введенный текст не может быть конвертирован в car");
+            }
+
+
         }
         return array;
     }
