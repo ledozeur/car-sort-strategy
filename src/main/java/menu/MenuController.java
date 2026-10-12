@@ -142,7 +142,7 @@ public class MenuController {
                 case 2:
 
                     if (!(cars.size() == 0)) {
-                        CarParserText.printArray(cars);
+                        System.out.println(cars);
                     } else {
                         System.out.println("Массив пуст.");
                     }
