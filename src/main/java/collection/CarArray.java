@@ -70,7 +70,7 @@ public class CarArray implements Iterable<Car> {
     @Override
     public String toString() {
         return Arrays.stream(data, 0, size)
-                .map(parser::ToText)
+                .map(parser::toText)
                 .collect(Collectors.joining())
                 .trim();
     }

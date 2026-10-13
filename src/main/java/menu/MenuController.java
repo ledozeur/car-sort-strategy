@@ -50,16 +50,21 @@ public class MenuController {
         System.out.println(
                 "В списке уже " + cars.size() + " авто.\n" +
                         "1 — заменить список новыми данными\n" +
-                        "2 — добавить новые данные к текущему списку");
+                        "2 — добавить новые данные к текущему списку\n" +
+                        "(сейчас нужна только цифра 1 или 2, не строка машины)");
         while (true) {
-            if (!sc.hasNextInt()) {
-                sc.nextLine();
+            String modeLine = sc.nextLine().trim();
+            if (modeLine.contains(";")) {
+                System.out.println(
+                        "Введена строка машины, а не режим. Сейчас выберите: 1 — заменить весь список, " +
+                                "2 — добавить к уже загруженным машинам.");
+                continue;
+            }
+            if (!modeLine.equals("1") && !modeLine.equals("2")) {
                 System.out.println("Введите 1 или 2.");
                 continue;
             }
-            int mode = sc.nextInt();
-            sc.nextLine();
-            if (mode == 1) {
+            if (modeLine.equals("1")) {
                 cars = newCars;
                 lastSorted = null;
                 System.out.println(
@@ -67,19 +72,16 @@ public class MenuController {
                                 "Повторите сортировку (п. 3), если нужен новый результат для п. 4.");
                 return;
             }
-            if (mode == 2) {
-                CarArray merged = cars.createCopy();
-                for (Car car : newCars) {
-                    merged.add(car);
-                }
-                cars = merged;
-                lastSorted = null;
-                System.out.println(
-                        "Данные добавлены. Сейчас в списке " + cars.size() + " автомобилей. " +
-                                "Повторите сортировку (п. 3), если нужен новый результат для п. 4.");
-                return;
+            CarArray merged = cars.createCopy();
+            for (Car car : newCars) {
+                merged.add(car);
             }
-            System.out.println("Введите 1 или 2.");
+            cars = merged;
+            lastSorted = null;
+            System.out.println(
+                    "Данные добавлены. Сейчас в списке " + cars.size() + " автомобилей. " +
+                            "Повторите сортировку (п. 3), если нужен новый результат для п. 4.");
+            return;
         }
     }
 

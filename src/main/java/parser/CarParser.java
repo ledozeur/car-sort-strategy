@@ -34,7 +34,7 @@ public class CarParser {
         }
     }
 
-    public StringBuilder ToText(Car car) {
+    public StringBuilder toText(Car car) {
         return new StringBuilder(car.getModel()).append(";")
                 .append(car.getPowerHp()).append(";")
                 .append(car.getProductionYear()).append("\n");
