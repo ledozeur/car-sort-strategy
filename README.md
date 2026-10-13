@@ -1,57 +1,84 @@
 # car-sort-strategy
 
-Сортировка автомобилей (`Car`): **Strategy**, **Builder**, валидация, 4 feature-ветки → `main`.
+Консольное приложение для сортировки коллекции автомобилей (`Car`): паттерны **Strategy** и **Builder**, валидация данных, кастомная коллекция. Три участника — три feature-ветки, результат в **`main`**.
 
-**Дедлайн:** 11.10.2026  
-**Репо:** https://github.com/ledozeur/car-sort-strategy.git  
+**Репозиторий:** https://github.com/ledozeur/car-sort-strategy.git
 
 ---
 
 ## Команда
 
-| Участник | Ветка | Зона |
-|----------|--------|------|
-| **Медведев Артём** | `feature/app-menu-integration` | Меню, merge PR, отчёты, защита (экран) |
-| **Павел Ворман** | `feature/car-model-collection-file` | Car, Builder, Validator, Comparator, CarCollection, fill из **файла** |
-| **Владимир Гришков** | `feature/sort-random-evenodd` | Сортировки, fill **random**, доп. **1** |
-| **Александр Веселков** | `feature/manual-io-parallel` | Parser, fill **вручную**, доп. **2**, **4**, тесты файла/count |
+| Участник | Ветка | Зона ответственности |
+|----------|--------|----------------------|
+| **Медведев Артём** | `feature/app-menu-integration` | `Main`, `MenuController`, интеграция сценария, merge в `main` |
+| **Ворман Павел** | `feature/car-model-collection-file` | `Car`, `CarValidator`, `CarArray`, `CarParser`, компараторы, `CarFillService`, `FileCarFillService` |
+| **Гришков Владимир** | `feature/sort-random-evenodd` | `SortStrategy` и реализации, `EvenOddSortDecorator`, `RandomCarFillService`, `ManualCarFillService`, `ResultFileWriter`, `ParallelCountService` |
 
 ---
 
-## Car
+## Доменная модель `Car`
 
-Поля: `model` (String), `powerHp` (30–1200), `productionYear` (1900–2026).  
-Файл: `Toyota Camry;181;2020` → папка `data/`.
+| Поле | Тип | Ограничения |
+|------|-----|-------------|
+| `model` | `String` | не пустая, длина 1–60 |
+| `powerHp` | `int` | 30–1200 |
+| `productionYear` | `int` | 1900–2026 |
 
-**Запуск:** JDK 17+, main-класс `ru.aston.Main` (меню — `MenuController`).
+**Формат строки** (файл, консоль): `Toyota Camry;181;2020`
 
----
-
-## Интерфейсы (свои, не из библиотек)
-
-| Интерфейс | Пакет | Кто | Зачем |
-|-----------|--------|-----|--------|
-| **`SortStrategy`** | `strategy` | **Владимир** | **Обязательно по ТЗ** — паттерн Strategy: разные алгоритмы сортировки с одной сигнатурой. |
-| **`CarFillService`** | `fill` | **Павел** (объявляет) | Один контракт для трёх способов заполнения; в меню можно вызывать через интерфейс. |
-
-**`SortStrategy`** — пример методов:
-
-```java
-void sort(Car[] array, int length, Comparator<Car> comparator);
-```
-
-**`CarFillService`** — пример:
-
-```java
-void fill(CarCollection target);  // внутри: файл / random / Scanner — у каждого класса по-своему
-```
-
-**Не интерфейс по ТЗ:** **`CarBuilder`** — это **класс** (паттерн Builder).  
-**`java.util.Comparator<Car>`** — для сравнения полей можно использовать **стандартный** интерфейс; реализации — ваши статические методы в `CarComparators` (обычно это лямбды или классы, не «скачанный» Comparator из готовой библиотеки сортировки).
+Создание объектов — через вложенный **`Car.CarBuilder`** (паттерн Builder). Валидация — в `CarValidator` и при сборке builder.
 
 ---
 
-## Структура программы (дерево)
+## Запуск
+
+- **JDK:** 17+ (в `pom.xml` указан compiler 23)
+- **Точка входа:** `Main` → `menu.MenuController`
+- **Maven:** из корня проекта  
+  - `mvn test` — тесты (JUnit 5)  
+  - запуск main-класса из IDE или `mvn -q exec:java` (при настроенном `exec-maven-plugin` в IDE достаточно Run на `Main`)
+
+**Данные:** каталог `data/` (`cars.txt` — примеры; `cars invalid.txt` — пример с ошибками).  
+**Результат сортировки (append):** `data/output/sorted-cars.txt`
+
+---
+
+## Меню (`MenuController`)
+
+| Пункт | Действие |
+|-------|----------|
+| **1** | Заполнить: файл / случайно / вручную; при непустом списке — заменить или добавить |
+| **2** | Показать **исходный** список (без учёта сортировки) |
+| **3** | Сортировать (исходный список **не меняется**; результат хранится для п. 4 и 6) |
+| **4** | Дописать **последний** результат сортировки в файл |
+| **5** | Многопоточный подсчёт вхождений `Car` в **исходном** списке (совпадение по всем полям) |
+| **6** | Показать результат **последней** сортировки |
+| **0** | Выход |
+
+**Сортировка (п. 3):** Bubble / Insertion; варианты с **Even/Odd** (доп. 1).  
+**Поле:** модель, мощность, год или **все поля** (`CarNaturalOrderComparator`: модель → мощность → год).  
+Even/Odd по модели недоступен (нужно числовое поле).
+
+**Лимиты:** в файле и при ручном вводе лимит — число **валидных** автомобилей; невалидные строки в коллекцию не попадают.
+
+---
+
+## Интерфейсы проекта
+
+| Интерфейс | Пакет | Назначение |
+|-----------|--------|------------|
+| `SortStrategy` | `strategy` | Паттерн Strategy: `CarArray sort(CarArray, CarComparator)` |
+| `CarFillService` | `fill` | `CarArray create(Integer limit)` — файл / random / ручной ввод |
+| `CarComparator` | `comparator` | Сравнение двух `Car` (свой контракт, не сортировка из JDK) |
+| `ResultWriter` | `io` | `boolean save(CarArray)` |
+
+**Builder** — класс `Car.CarBuilder`, не интерфейс.
+
+Готовые **алгоритмы сортировки** JDK (`Arrays.sort`, `Collections.sort` для коллекции машин) **не используются**.
+
+---
+
+## Структура проекта
 
 ```text
 car-sort-strategy/
@@ -59,76 +86,70 @@ car-sort-strategy/
 ├── README.md
 ├── data/
 │   ├── cars.txt
-│   └── cars_bad.txt
-├── output/
-│   └── sorted_cars.txt
-└── src/main/java/ru/aston/
-    ├── Main.java
-    │
-    ├── menu/
-    │   └── MenuController.java                 # Артём
-    │
-    ├── model/
-    │   ├── Car.java                            # Павел
-    │   └── CarBuilder.java                     # Павел (класс, не interface)
-    │
-    ├── validation/
-    │   └── CarValidator.java                   # Павел
-    │
-    ├── comparator/
-    │   └── CarComparators.java                 # Павел (Comparator<Car>, не свой interface)
-    │
-    ├── collection/
-    │   └── CarCollection.java                  # Павел
-    │
-    ├── parser/
-    │   └── CarParser.java                      # Александр
-    │
-    ├── fill/
-    │   ├── CarFillService.java                 # interface — Павел
-    │   ├── FileCarFillService.java             # implements CarFillService — Павел
-    │   ├── RandomCarFillService.java           # implements CarFillService — Владимир
-    │   └── ManualCarFillService.java           # implements CarFillService — Александр
-    │
-    ├── strategy/
-    │   ├── SortStrategy.java                   # interface — Владимир
-    │   ├── BubbleSortStrategy.java             # implements SortStrategy
-    │   ├── InsertionSortStrategy.java          # implements SortStrategy
-    │   └── EvenOddPowerSortStrategy.java       # implements SortStrategy — доп. 1
-    │
-    ├── sort/
-    │   ├── SortAlgorithm.java                  # enum для меню — Владимир
-    │   └── SortField.java                      # enum — Владимир
-    │
-    ├── io/
-    │   └── ResultFileWriter.java               # Александр (класс; interface не обязателен)
-    │
-    ├── concurrency/
-    │   └── ParallelCountService.java           # Александр
-    │
-    └── tests/
-        ├── CarBuilderTest.java                 # Павел
-        ├── CarCollectionTest.java              # Павел
-        ├── BubbleSortTest.java                 # Владимир
-        ├── EvenOddSortTest.java                # Владимир
-        ├── CarParserTest.java                  # Александр
-        └── ParallelCountTest.java              # Александр
+│   ├── cars invalid.txt
+│   └── output/
+│       └── sorted-cars.txt          # создаётся при записи (п. 4 меню)
+└── src/
+    ├── main/java/
+    │   ├── Main.java
+    │   ├── menu/
+    │   │   └── MenuController.java
+    │   ├── model/
+    │   │   └── Car.java             # + вложенный CarBuilder
+    │   ├── validation/
+    │   │   └── CarValidator.java
+    │   ├── parser/
+    │   │   └── CarParser.java
+    │   ├── collection/
+    │   │   └── CarArray.java
+    │   ├── comparator/
+    │   │   ├── CarComparator.java
+    │   │   ├── CarModelComparator.java
+    │   │   ├── CarPowerHpComparator.java
+    │   │   ├── CarProductionYearComparator.java
+    │   │   └── CarNaturalOrderComparator.java
+    │   ├── fill/
+    │   │   ├── CarFillService.java
+    │   │   ├── FileCarFillService.java
+    │   │   ├── RandomCarFillService.java
+    │   │   └── ManualCarFillService.java
+    │   ├── strategy/
+    │   │   ├── SortStrategy.java
+    │   │   ├── BubbleSortStrategy.java
+    │   │   ├── InsertionSortStrategy.java
+    │   │   └── EvenOddSortDecorator.java
+    │   ├── io/
+    │   │   ├── ResultWriter.java
+    │   │   └── ResultFileWriter.java
+    │   └── concurrency/
+    │       └── ParallelCountService.java
+    └── test/java/                   # JUnit 5
+        ├── model/CarTest.java
+        ├── validation/CarValidatorTest.java
+        ├── collection/CarArrayTest.java
+        ├── parser/CarParserTest.java
+        ├── comparator/CarComparatorTest.java
+        ├── fill/                    # File, Manual, Random
+        ├── sort/                    # Bubble, Insertion, EvenOdd
+        ├── io/ResultFileWriterTest.java
+        └── concurrency/ParallelCountServiceTest.java
 ```
 
 ---
 
-## Доп. задания
+## Дополнительные задания
 
-| № | Кто |
-|---|-----|
-| 1 — чёт/нечёт по powerHp | Владимир |
-| 2 — append в `output/sorted_cars.txt` | Александр |
-| 3 — Stream при fill | Павел (файл), Владимир (random), Александр (ручной) |
-| 3* — `CarCollection` | Павел |
-| 4 — многопоточный count | Александр |
+| № | Реализация |
+|---|------------|
+| **1** | `EvenOddSortDecorator` + пункты 3–4 в меню сортировки |
+| **2** | `ResultFileWriter`, режим append → `data/output/sorted-cars.txt` |
+| **3** | Stream: `FileCarFillService` (`Files.lines`), `RandomCarFillService` (`IntStream`) |
+| **3\*** | Кастомная коллекция `CarArray` |
+| **4** | `ParallelCountService` — `Thread`, разбиение по индексам, вывод в консоль |
 
 ---
 
-## Сдача
+## Git
 
-4 ветки смержены в `main`, ссылка в чат курса **11.10**, презентация ≤ 20 мин.
+Три feature-ветки (по одной на участника) смержены в **`main`**.  
+Ссылка на репозиторий передаётся по требованиям курса.
