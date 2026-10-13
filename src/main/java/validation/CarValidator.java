@@ -8,7 +8,7 @@ public class CarValidator {
             throw new IllegalArgumentException("Car model must not be blank");
         }
         if(model.length() > 60) {
-            throw new IllegalArgumentException("Car model lenght must be in 1-60. model: " + model + ", length: "+ model.length());
+            throw new IllegalArgumentException("Car model length must be in 1-60. model: " + model + ", length: "+ model.length());
         }
         return model;
     }

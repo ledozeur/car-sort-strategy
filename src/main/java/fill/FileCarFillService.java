@@ -40,11 +40,10 @@ public class FileCarFillService implements CarFillService {
     }
 
     private Optional<Car> parseOrReport(int lineNumber, String line) {
-        CarParser.LineParseResult result = parser.parseLine(line);
-        if (result.car().isEmpty()) {
-            String reason = result.errorMessage().orElse("неверные данные");
-            System.out.printf("Строка %d: \"%s\" — %s%n", lineNumber, line, reason);
+        Optional<Car> car = parser.parse(line);
+        if (car.isEmpty()) {
+            System.out.println(lineNumber + ": " + line + " (invalid)");
         }
-        return result.car();
+        return car;
     }
 }
