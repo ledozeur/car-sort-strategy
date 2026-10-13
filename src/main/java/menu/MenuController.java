@@ -3,6 +3,7 @@ package menu;
 import collection.CarArray;
 import comparator.CarComparator;
 import comparator.CarModelComparator;
+import comparator.CarNaturalOrderComparator;
 import comparator.CarPowerHpComparator;
 import comparator.CarProductionYearComparator;
 import fill.FileCarFillService;
@@ -34,6 +35,7 @@ public class MenuController {
     private final CarModelComparator carModelComparator = new CarModelComparator();
     private final CarPowerHpComparator carPowerHpComparator = new CarPowerHpComparator();
     private final CarProductionYearComparator carProductionYearComparator = new CarProductionYearComparator();
+    private final CarNaturalOrderComparator carNaturalOrderComparator = new CarNaturalOrderComparator();
     private final ResultFileWriter resultFileWriter = new ResultFileWriter();
     private final ParallelCountService parallelCountService = new ParallelCountService();
     private final CarParser carParser = new CarParser();
@@ -90,15 +92,16 @@ public class MenuController {
         while (true) {
             System.out.println(
                     "1 — заполнить массив\n" +
-                            "2 — показать текущий список (исходный, как после п. 1)\n" +
-                            "3 — сортировать (исходный список не меняется; результат — для п. 4)\n" +
+                            "2 — показать исходный список (как после п. 1, без сортировки)\n" +
+                            "3 — сортировать (исходный список не меняется)\n" +
                             "4 — записать в файл последний результат сортировки (п. 3)\n" +
-                            "5 — подсчитать вхождения в текущем списке (п. 2), не в отсортированном\n" +
+                            "5 — подсчитать вхождения в исходном списке (п. 2)\n" +
+                            "6 — показать результат последней сортировки (п. 3)\n" +
                             "0 — выход");
 
             if (!sc.hasNextInt()) {
                 sc.nextLine();
-                System.out.println("Введите число от 0 до 5.");
+                System.out.println("Введите число от 0 до 6.");
                 continue;
             }
             int choice = sc.nextInt();
@@ -257,11 +260,12 @@ public class MenuController {
                                     "1 — модель\n" +
                                     "2 — мощность\n" +
                                     "3 — год выпуска\n" +
+                                    "4 — все поля (модель → мощность → год)\n" +
                                     "0 — назад");
 
                     if (!sc.hasNextInt()) {
                         sc.nextLine();
-                        System.out.println("Введите число от 0 до 3.");
+                        System.out.println("Введите число от 0 до 4.");
                         break;
                     }
                     int field = sc.nextInt();
@@ -278,6 +282,8 @@ public class MenuController {
                         comparator = carPowerHpComparator;
                     } else if (field == 3) {
                         comparator = carProductionYearComparator;
+                    } else if (field == 4) {
+                        comparator = carNaturalOrderComparator;
                     } else {
                         System.out.println("Неверное поле.");
                         break;
@@ -286,7 +292,7 @@ public class MenuController {
                     boolean evenOddMode = alg == 3 || alg == 4;
                     if (evenOddMode && field == 1) {
                         System.out.println(
-                                "Even/Odd для модели не поддерживается. Выберите мощность (2) или год (3).");
+                                "Even/Odd для модели не поддерживается. Выберите мощность (2), год (3) или все поля (4).");
                         break;
                     }
 
@@ -299,6 +305,10 @@ public class MenuController {
                         Function<Car, Integer> evenOddKey;
                         if (field == 3) {
                             evenOddKey = car -> car.getProductionYear();
+                        } else if (field == 4) {
+                            System.out.println(
+                                    "Even/Odd: чётность по мощности; порядок среди чётных — по всем полям (п. 4).");
+                            evenOddKey = Car::getPowerHp;
                         } else {
                             evenOddKey = car -> car.getPowerHp();
                         }
@@ -315,9 +325,18 @@ public class MenuController {
 
                     lastSorted = strategy.sort(cars, comparator);
 
-                    System.out.println("Отсортированный массив (для записи в файл — пункт 4):");
+                    System.out.println("Отсортированный массив:");
                     System.out.println(lastSorted);
-                    System.out.println("Исходный список (пункт 2) не изменён.");
+                    System.out.println("Исходный список — п. 2; повторно результат — п. 6; в файл — п. 4.");
+                    break;
+                }
+                case 6: {
+                    if (lastSorted == null || lastSorted.size() == 0) {
+                        System.out.println("Нет результата сортировки. Сначала выполните пункт 3.");
+                        break;
+                    }
+                    System.out.println("Результат последней сортировки (" + lastSorted.size() + " авто):");
+                    System.out.println(lastSorted);
                     break;
                 }
                 case 4: {
@@ -328,7 +347,7 @@ public class MenuController {
                         break;
                     }
                     if (resultFileWriter.save(lastSorted)) {
-                        System.out.println("Данные добавлены в файл output/sorted_cars.txt");
+                        System.out.println("Данные добавлены в файл data/output/sorted-cars.txt");
                     } else {
                         System.out.println("Не удалось записать файл.");
                     }
@@ -358,7 +377,7 @@ public class MenuController {
                 case 0:
                     return;
                 default:
-                    System.out.println("Нет такого пункта. Введите число от 0 до 5.");
+                    System.out.println("Нет такого пункта. Введите число от 0 до 6.");
                     break;
             }
         }
