@@ -4,8 +4,10 @@ import collection.CarArray;
 import model.Car;
 import parser.CarParser;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 public class ManualCarFillService implements CarFillService {
     private final Scanner scanner;
@@ -17,17 +19,20 @@ public class ManualCarFillService implements CarFillService {
 
     @Override
     public CarArray create(Integer limit) {
-        CarArray array = new CarArray();
+        StringBuilder cars = new StringBuilder();
         boolean scan = true;
         while (scan) {
             System.out.println("\n\n\n");
-            if (array.size() > 0) {
-                System.out.println(array);
+            if (!cars.isEmpty()) {
+                System.out.println(cars);
                 System.out.println("Для сохранения данных и выхода введите \"-1\"");
                 System.out.println("Для сброса списка введите \"-2\"");
             }
-            if (array.size() >= limit && limit != -1) {
-                return array;
+            if (getCarCount(cars) >= limit && limit != -1) {
+                CarArray array = getArray(cars);
+                if (array.size() >= limit) {
+                    return array;
+                }
             }
 
             String text = scanner.nextLine();
@@ -37,21 +42,39 @@ public class ManualCarFillService implements CarFillService {
                 continue;
             }
             if (text.trim().equals("-2")) {
-                array.clear();
+                cars = new StringBuilder();
                 continue;
             }
 
-            Optional<Car> car = parser.parse(text);
-            if (car.isPresent()) {
-                array.add(car.get());
-            } else {
-                System.out.println("Введенный текст не может быть конвертирован в car");
-            }
-
+            cars.append(text).append("\n");
 
         }
-        return array;
+        return getArray(cars);
     }
 
+    private long getCarCount(StringBuilder cars) {
+        return cars.chars()
+                .filter(c -> c == '\n')
+                .count();
+    }
+
+    private CarArray getArray(StringBuilder cars) {
+        CarArray array = new CarArray();
+        String[] lines = cars.toString().split("\n");
+
+        IntStream.range(0, lines.length)
+                .forEach(i -> {
+                    Optional<Car> car = parser.parse(lines[i]);
+
+                    car.ifPresentOrElse(
+                            array::add,
+                            () -> System.out.println(
+                                    "Невалидная строка № " + (i + 1)
+                            )
+                    );
+                });
+
+        return array;
+    }
 
 }
