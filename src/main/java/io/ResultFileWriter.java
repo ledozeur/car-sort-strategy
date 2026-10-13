@@ -5,7 +5,6 @@ import collection.CarArray;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -25,8 +24,7 @@ public class ResultFileWriter implements ResultWriter {
         String txt = carArrayToTxt(data);
 
         try (BufferedWriter bf = new BufferedWriter(new FileWriter(
-                defaultPath + Instant.now().toEpochMilli()
-                        + ".txt"))) {
+                defaultPath + "sorted-cars.txt", true))) {
 
             bf.write(txt);
         } catch (IOException e) {
